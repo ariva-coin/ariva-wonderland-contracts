@@ -1,0 +1,18 @@
+const config = {
+  bsc: {
+    metaTransactionContract: "0x0000000000000000000000000000000000000000",
+    admin: "0xb26B59977EED6756e73D0B3BA102780c06C54569",
+    saleWallet: "0xb26B59977EED6756e73D0B3BA102780c06C54569",
+    land: "",
+    arv: "",
+  },
+  bsct: {
+    metaTransactionContract: "0x0000000000000000000000000000000000000000",
+    admin: "0xb26B59977EED6756e73D0B3BA102780c06C54569",
+    saleWallet: "0xb26B59977EED6756e73D0B3BA102780c06C54569",
+    land: "0x2AD7e1B86415F191E74589daD301cec3338ac89E",
+    arv: "0x2D4A43205C4Fc5a9f66fD61a0925569026eA6342",
+  },
+};
+
+export default config;
