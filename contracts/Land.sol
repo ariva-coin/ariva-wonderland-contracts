@@ -50,7 +50,8 @@ contract Land is LandBaseToken {
      */
     function tokenURI(uint256 id) public view returns (string memory) {
         require(_ownerOf(id) != address(0), "Id does not exist");
-        return string(abi.encodePacked("https://api.sandbox.game/lands/", uint2str(id), "/metadata.json"));
+        // return string(abi.encodePacked("https://api.sandbox.game/lands/", uint2str(id), "/metadata.json"));
+        return string(abi.encodePacked(uint2str(id), "/metadata.json"));
     }
 
     /**

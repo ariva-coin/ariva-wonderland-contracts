@@ -9,7 +9,7 @@ import "../contracts_common/BaseWithStorage/MetaTransactionReceiver.sol";
  * @notice This contract mananges the sale of our lands
  */
 contract ArivaLandSale is MetaTransactionReceiver {
-    uint256 internal constant GRID_SIZE = 408; // 408 is the size of the Land
+    uint256 internal constant GRID_SIZE = 15620; // 15620 is the size of the Land
 
     Land internal _land;
     ERC20 internal _ariva;

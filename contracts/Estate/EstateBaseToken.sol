@@ -10,7 +10,7 @@ contract EstateBaseToken is ERC721BaseToken {
     uint8 internal constant BREAK = 2;
     uint8 internal constant WITHDRAWAL = 3;
 
-    uint16 internal constant GRID_SIZE = 408;
+    uint16 internal constant GRID_SIZE = 15620;
 
     uint256 _nextId = 1;
     mapping(uint256 => uint24[]) _quadsInEstate;
@@ -28,14 +28,26 @@ contract EstateBaseToken is ERC721BaseToken {
         _land = land;
     }
 
-    function createFromQuad(address sender, address to, uint256 size, uint256 x, uint256 y) external returns (uint256) {
+    function createFromQuad(
+        address sender,
+        address to,
+        uint256 size,
+        uint256 x,
+        uint256 y
+    ) external returns (uint256) {
         _check_authorized(sender, ADD);
         uint256 estateId = _mintEstate(to);
         _addSingleQuad(sender, estateId, size, x, y);
         return estateId;
     }
 
-    function addQuad(address sender, uint256 estateId, uint256 size, uint256 x, uint256 y) external {
+    function addQuad(
+        address sender,
+        uint256 estateId,
+        uint256 size,
+        uint256 x,
+        uint256 y
+    ) external {
         _check_authorized(sender, ADD);
         _check_hasOwnerRights(sender, estateId);
         _addSingleQuad(sender, estateId, size, x, y);
@@ -87,7 +99,7 @@ contract EstateBaseToken is ERC721BaseToken {
         uint256[] calldata xs,
         uint256[] calldata ys,
         uint256[] calldata junctions
-        ) external {
+    ) external {
         _check_authorized(sender, ADD);
         _check_hasOwnerRights(sender, estateId);
         _addQuads(sender, estateId, sizes, xs, ys, junctions, false);
@@ -101,7 +113,11 @@ contract EstateBaseToken is ERC721BaseToken {
         emit Transfer(sender, address(0), estateId);
     }
 
-    function transferFromDestroyedEstate(address sender, address to, uint256 num) external {
+    function transferFromDestroyedEstate(
+        address sender,
+        address to,
+        uint256 num
+    ) external {
         _check_authorized(sender, WITHDRAWAL);
         // TODO
         // require(sender != address(this), "from itself");
@@ -113,7 +129,6 @@ contract EstateBaseToken is ERC721BaseToken {
         // require(sender == _pastOwnerOf(estateId), "only owner can transfer land from destroyed estate");
         // TODO
     }
-
 
     // //////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -144,21 +159,33 @@ contract EstateBaseToken is ERC721BaseToken {
         require(owner == sender, "not owner");
         require(
             _superOperators[msg.sender] ||
-            _operatorsForAll[sender][msg.sender] ||
-            (operatorEnabled && _operators[estateId] == msg.sender),
+                _operatorsForAll[sender][msg.sender] ||
+                (operatorEnabled && _operators[estateId] == msg.sender),
             "not approved"
         );
     }
 
     // //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    function _encode(uint16 x, uint16 y, uint8 size) internal pure returns (uint24) {
+    function _encode(
+        uint16 x,
+        uint16 y,
+        uint8 size
+    ) internal pure returns (uint24) {
         return uint24(size) * uint24(2**18) + (uint24(x) + uint24(y) * GRID_SIZE);
     }
 
-    function _decode(uint24 data) internal pure returns (uint16 x, uint16 y, uint8 size) {
+    function _decode(uint24 data)
+        internal
+        pure
+        returns (
+            uint16 x,
+            uint16 y,
+            uint8 size
+        )
+    {
         size = uint8(data / (2**18));
-        y = uint16(data % (2**18) / GRID_SIZE);
+        y = uint16((data % (2**18)) / GRID_SIZE);
         x = uint16(data % GRID_SIZE);
     }
 
@@ -180,7 +207,7 @@ contract EstateBaseToken is ERC721BaseToken {
     ) internal {
         _land.transferQuad(sender, address(this), size, x, y, "");
         uint24[] memory list = new uint24[](1);
-        list[0] = _encode(uint16(x),uint16(y),uint8(size));
+        list[0] = _encode(uint16(x), uint16(y), uint8(size));
         // TODO check adjacency
         _quadsInEstate[estateId].push(list[0]);
         emit QuadsAddedInEstate(estateId, list);
@@ -211,22 +238,29 @@ contract EstateBaseToken is ERC721BaseToken {
         emit QuadsAddedInEstate(estateId, list);
     }
 
-    function _adjacent(uint16 x1, uint16 y1, uint16 x2, uint16 y2) internal pure returns(bool) {
-        return (
-            (x1 == x2 && y1 == y2 - 1) ||
+    function _adjacent(
+        uint16 x1,
+        uint16 y1,
+        uint16 x2,
+        uint16 y2
+    ) internal pure returns (bool) {
+        return ((x1 == x2 && y1 == y2 - 1) ||
             (x1 == x2 && y1 == y2 + 1) ||
             (x1 == x2 - 1 && y1 == y2) ||
-            (x1 == x2 + 1 && y1 == y2)
-        );
+            (x1 == x2 + 1 && y1 == y2));
     }
 
-    function _adjacent(uint16 x1, uint16 y1, uint16 x2, uint16 y2, uint8 s2) internal pure returns(bool) {
-        return (
-            (x1 >= x2 && x1 < x2 + s2 && y1 == y2 - 1) ||
+    function _adjacent(
+        uint16 x1,
+        uint16 y1,
+        uint16 x2,
+        uint16 y2,
+        uint8 s2
+    ) internal pure returns (bool) {
+        return ((x1 >= x2 && x1 < x2 + s2 && y1 == y2 - 1) ||
             (x1 >= x2 && x1 < x2 + s2 && y1 == y2 + s2) ||
             (x1 == x2 - 1 && y1 >= y2 && y1 < y2 + s2) ||
-            (x1 == x2 - s2 && y1 >= y2 && y1 < y2 + s2)
-        );
+            (x1 == x2 - s2 && y1 >= y2 && y1 < y2 + s2));
     }
 
     function _addLands(
@@ -248,7 +282,7 @@ contract EstateBaseToken is ERC721BaseToken {
         uint16 lastX = 409;
         uint16 lastY = 409;
         if (!justCreated) {
-            uint24 d = _quadsInEstate[estateId][l-1];
+            uint24 d = _quadsInEstate[estateId][l - 1];
             lastX = uint16(d % GRID_SIZE);
             lastY = uint16(d % GRID_SIZE);
         }
@@ -261,7 +295,7 @@ contract EstateBaseToken is ERC721BaseToken {
                 j++;
                 uint24 data;
                 if (index >= l) {
-                    require(index -l < j, "junctions need to refers to previously accepted land");
+                    require(index - l < j, "junctions need to refers to previously accepted land");
                     data = list[index - l];
                 } else {
                     data = _quadsInEstate[estateId][j];
