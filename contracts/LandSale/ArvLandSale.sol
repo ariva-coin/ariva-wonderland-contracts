@@ -10,7 +10,6 @@ contract ArvLandSale is MetaTransactionReceiver {
     Land internal _land;
     ERC20 internal _ariva;
     address payable internal _wallet;
-    address _admin;
 
     uint256 _startTime;
 
@@ -53,11 +52,6 @@ contract ArvLandSale is MetaTransactionReceiver {
     function setReceivingWallet(address payable newWallet) external onlyAdmin {
         require(newWallet != address(0), "receiving wallet cannot be zero address");
         _wallet = newWallet;
-    }
-
-    function setAdmin(address newAdmin) external onlyAdmin {
-        require(newAdmin != address(0), "admin cannot be zero address");
-        _admin = newAdmin;
     }
 
     function setSellQuad(

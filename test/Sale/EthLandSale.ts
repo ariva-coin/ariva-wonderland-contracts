@@ -16,7 +16,7 @@ import {
   getSnapShot,
   ZERO_ADDRESS,
 } from "../utils";
-import { parseUnits } from "ethers/lib/utils";
+import { parseEther, parseUnits } from "ethers/lib/utils";
 
 const { expect } = chai;
 
@@ -83,15 +83,7 @@ describe("EthLandSale", function () {
     });
   });
 
-  describe("check prices", function () {
-    it("check basic price", async () => {
-      expect(await ethLandSale.getPrice(1)).to.equal(ether(0.1));
-      expect(await ethLandSale.getPrice(3)).to.equal(ether(1));
-      expect(await ethLandSale.getPrice(6)).to.equal(ether(4.5));
-      expect(await ethLandSale.getPrice(12)).to.equal(ether(20));
-      expect(await ethLandSale.getPrice(24)).to.equal(ether(90));
-    });
-
+  describe("check startTime", function () {
     it("check startTime", async () => {
       expect(await ethLandSale.startTime()).to.equal(wei(startTime));
     });
@@ -109,15 +101,12 @@ describe("EthLandSale", function () {
       await expect(ethLandSale.connect(tester1).buyLand(tester2.address, tester1.address, 1, 1, 1)).to.be.revertedWith(
         "not authorized",
       );
-      await expect(ethLandSale.connect(tester1).buyLand(tester1.address, tester1.address, 1, 1, 2)).to.be.revertedWith(
-        "Price is not set yet",
-      );
 
       await expect(ethLandSale.connect(tester1).buyLand(tester1.address, tester1.address, 1, 1, 1)).to.be.revertedWith(
         "Not on sale",
       );
 
-      await ethLandSale.connect(admin).setSellQuad(1, 1, 1, true);
+      await ethLandSale.connect(admin).setSellQuad(1, 1, 1, parseEther("0.1"));
 
       const prevBalance = await ethers.provider.getBalance(wallet.address);
 
@@ -128,26 +117,33 @@ describe("EthLandSale", function () {
       expect(afterBalance.sub(prevBalance)).to.equal(ether(0.1));
     });
     it("buy (3,3) land", async () => {
-      await ethLandSale.connect(admin).setSellQuads([3, 6, 12, 24], [3, 6, 12, 24], [3, 6, 12, 24], true);
+      await ethLandSale
+        .connect(admin)
+        .setSellQuads(
+          [3, 6, 12, 24],
+          [3, 6, 12, 24],
+          [3, 6, 12, 24],
+          [parseEther("1"), parseEther("4.5"), parseEther("20"), parseEther("90")],
+        );
 
       await expect(ethLandSale.connect(tester1).buyLand(tester1.address, tester1.address, 3, 3, 1)).to.be.revertedWith(
         "Not on sale",
       );
+
+      expect(await ethLandSale.getPrice(3, 3, 3)).to.equal(ether(1));
       await ethLandSale.connect(tester1).buyLand(tester1.address, tester1.address, 3, 3, 3, { value: ether(1) });
 
-      expect(await ethLandSale.isQuadSelling(3, 3, 3)).to.equal(false);
+      expect(await ethLandSale.getPrice(3, 3, 3)).to.equal(ZERO);
     });
 
     it("buy (12,12) land", async () => {
+      expect(await ethLandSale.getPrice(12, 12, 12)).to.equal(ether(20));
       await ethLandSale.connect(tester2).buyLand(tester2.address, tester2.address, 12, 12, 12, { value: ether(20) });
-
-      expect(await ethLandSale.isQuadSelling(12, 12, 12)).to.equal(false);
     });
 
     it("buy (24,24) land", async () => {
+      expect(await ethLandSale.getPrice(24, 24, 24)).to.equal(ether(90));
       await ethLandSale.connect(tester3).buyLand(tester3.address, tester3.address, 24, 24, 24, { value: ether(90) });
-
-      expect(await ethLandSale.isQuadSelling(12, 12, 12)).to.equal(false);
     });
 
     it("withdrawQuad", async () => {

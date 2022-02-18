@@ -9,13 +9,10 @@ contract EthLandSale is MetaTransactionReceiver {
 
     Land internal _land;
     address payable internal _wallet;
-    address _admin;
 
     uint256 _startTime;
 
-    mapping(bytes32 => bool) private _quads;
-
-    mapping(uint256 => uint256) internal _prices; // prices[3] => price of 3*3
+    mapping(bytes32 => uint256) private _prices;
 
     event LandQuadPurchased(
         address indexed buyer,
@@ -39,12 +36,6 @@ contract EthLandSale is MetaTransactionReceiver {
         _admin = admin;
         _wallet = initialWalletAddress;
         _startTime = sTime;
-
-        _prices[1] = 1 ether / 10;
-        _prices[3] = 1 ether;
-        _prices[6] = 9 ether / 2;
-        _prices[12] = 20 ether;
-        _prices[24] = 90 ether;
     }
 
     modifier onlyAdmin() {
@@ -60,39 +51,23 @@ contract EthLandSale is MetaTransactionReceiver {
         _wallet = newWallet;
     }
 
-    function setAdmin(address newAdmin) external onlyAdmin {
-        require(newAdmin != address(0), "admin cannot be zero address");
-        _admin = newAdmin;
-    }
-
-    function setPrice(uint256 size, uint256 price) external onlyAdmin {
-        _prices[size] = price;
-    }
-
-    function setPrices(uint256[] calldata sizes, uint256[] calldata prices) external onlyAdmin {
-        require(sizes.length == prices.length, "Invalid input");
-        for (uint256 index = 0; index < sizes.length; index++) {
-            _prices[sizes[index]] = prices[index];
-        }
-    }
-
     function setSellQuad(
         uint256 x,
         uint256 y,
         uint256 size,
-        bool sale
+        uint256 price
     ) external onlyAdmin {
         bytes32 hash = _generateLandHash(x, y, size);
-        _quads[hash] = sale;
+        _prices[hash] = price;
     }
 
     function setSellQuads(
         uint256[] calldata xs,
         uint256[] calldata ys,
         uint256[] calldata sizes,
-        bool sale
+        uint256[] calldata prices
     ) external onlyAdmin {
-        require(xs.length == ys.length && ys.length == sizes.length, "Invalid params");
+        require(xs.length == ys.length && ys.length == sizes.length && sizes.length == prices.length, "Invalid params");
 
         for (uint256 index = 0; index < xs.length; index++) {
             uint256 x = xs[index];
@@ -100,7 +75,7 @@ contract EthLandSale is MetaTransactionReceiver {
             uint256 size = sizes[index];
 
             bytes32 hash = _generateLandHash(x, y, size);
-            _quads[hash] = sale;
+            _prices[hash] = prices[index];
         }
     }
 
@@ -124,11 +99,9 @@ contract EthLandSale is MetaTransactionReceiver {
         /* solhint-disable-next-line not-rely-on-time */
         require(buyer == msg.sender || _metaTransactionContracts[msg.sender], "not authorized");
 
-        uint256 price = _prices[size];
-        require(price > 0, "Price is not set yet");
-
         bytes32 hash = _generateLandHash(x, y, size);
-        require(_quads[hash], "Not on sale");
+        uint256 price = _prices[hash];
+        require(price > 0, "Not on sale");
 
         require(msg.value == price, "Insufficient ether");
 
@@ -136,7 +109,7 @@ contract EthLandSale is MetaTransactionReceiver {
 
         _land.transferQuad(address(this), to, size, x, y, "");
 
-        _quads[hash] = false;
+        delete _prices[hash];
         emit LandQuadPurchased(buyer, to, x + (y * GRID_SIZE), size, price);
     }
 
@@ -148,17 +121,29 @@ contract EthLandSale is MetaTransactionReceiver {
         _land.transferQuad(address(this), msg.sender, size, x, y, "");
     }
 
-    function getPrice(uint256 size) external view returns (uint256) {
-        return _prices[size];
-    }
-
-    function isQuadSelling(
+    function getPrice(
         uint256 x,
         uint256 y,
         uint256 size
-    ) public view returns (bool) {
+    ) external view returns (uint256) {
         bytes32 hash = _generateLandHash(x, y, size);
-        return _quads[hash];
+        return _prices[hash];
+    }
+
+    function getPrices(
+        uint256[] calldata xs,
+        uint256[] calldata ys,
+        uint256[] calldata sizes
+    ) external view returns (uint256[] memory) {
+        require(xs.length == ys.length && ys.length == sizes.length, "Invalid params");
+
+        uint256[] memory prices = new uint256[](xs.length);
+
+        for (uint256 index = 0; index < xs.length; index++) {
+            bytes32 hash = _generateLandHash(xs[index], ys[index], sizes[index]);
+            prices[index] = _prices[hash];
+        }
+        return prices;
     }
 
     function _generateLandHash(
