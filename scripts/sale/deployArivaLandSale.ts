@@ -4,8 +4,8 @@ import { Contract, ContractFactory } from "ethers";
 // When running the script with `hardhat run <script>` you'll find the Hardhat
 // Runtime Environment's members available in the global scope.
 import hre, { ethers } from "hardhat";
-import { waitSeconds } from "./utils";
-import config from "./config";
+import { waitSeconds } from "../utils";
+import config from "../config";
 
 async function main(): Promise<void> {
   // Hardhat always runs the compile task when running scripts through it.

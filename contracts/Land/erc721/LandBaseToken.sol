@@ -48,7 +48,7 @@ contract LandBaseToken is ERC721BaseToken {
     /// @notice total height of the map
     /// @return height
     function height() external returns (uint256) {
-        return GRID_SIZE;
+        return GRID_HEIGHT;
     }
 
     /// @notice x coordinate of Land token
