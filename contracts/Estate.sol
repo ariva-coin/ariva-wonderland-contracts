@@ -9,19 +9,14 @@ contract Estate is EstateBaseToken {
         address metaTransactionContract,
         address admin,
         LandToken land
-    ) public EstateBaseToken(
-        metaTransactionContract,
-        admin,
-        land
-    ) {
-    }
+    ) public EstateBaseToken(metaTransactionContract, admin, land) {}
 
     /**
      * @notice Return the name of the token contract
      * @return The name of the token contract
      */
     function name() external pure returns (string memory) {
-        return "Sandbox's ESTATEs";
+        return "Wonderland's ESTATEs";
     }
 
     /**
@@ -33,20 +28,20 @@ contract Estate is EstateBaseToken {
     }
 
     // solium-disable-next-line security/no-assign-params
-    function uint2str(uint _i) internal pure returns (string memory) {
+    function uint2str(uint256 _i) internal pure returns (string memory) {
         if (_i == 0) {
             return "0";
         }
-        uint j = _i;
-        uint len;
+        uint256 j = _i;
+        uint256 len;
         while (j != 0) {
             len++;
             j /= 10;
         }
         bytes memory bstr = new bytes(len);
-        uint k = len - 1;
+        uint256 k = len - 1;
         while (_i != 0) {
-            bstr[k--] = byte(uint8(48 + _i % 10));
+            bstr[k--] = bytes1(uint8(48 + (_i % 10)));
             _i /= 10;
         }
         return string(bstr);
@@ -59,14 +54,7 @@ contract Estate is EstateBaseToken {
      */
     function tokenURI(uint256 id) public view returns (string memory) {
         require(_ownerOf(id) != address(0), "Id does not exist");
-        return
-            string(
-                abi.encodePacked(
-                    "https://api.sandbox.game/estate/",
-                    uint2str(id),
-                    "/metadata.json"
-                )
-            );
+        return string(abi.encodePacked(uint2str(id), "/metadata.json"));
     }
 
     /**

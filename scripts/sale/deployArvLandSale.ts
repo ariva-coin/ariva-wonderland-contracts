@@ -14,7 +14,7 @@ async function main(): Promise<void> {
   // await run("compile");
 
   // We get the contract to deploy
-  const params = config.bsct;
+  const params = config.bsc;
   const param = [
     params.land,
     params.arv,

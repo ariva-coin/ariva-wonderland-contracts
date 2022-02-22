@@ -106,8 +106,8 @@ const config: HardhatUserConfig = {
     ],
   },
   etherscan: {
-    // apiKey: process.env.ETHERSCAN,
-    apiKey: process.env.BSCSCAN,
+    apiKey: process.env.ETHERSCAN,
+    // apiKey: process.env.BSCSCAN,
   },
   mocha: {
     timeout: 200000,

@@ -7,7 +7,6 @@ import hre, { ethers } from "hardhat";
 import { waitSeconds } from "./utils";
 import config from "./config";
 
-
 async function main(): Promise<void> {
   // Hardhat always runs the compile task when running scripts through it.
   // If this runs in a standalone fashion you may want to call compile manually
@@ -15,8 +14,8 @@ async function main(): Promise<void> {
   // await run("compile");
 
   // We get the contract to deploy
-  const params = config.bsct;
-  const param = [params.metaTransactionContract, params.admin]
+  const params = config.mainnet;
+  const param = [params.metaTransactionContract, params.admin];
 
   // construction params
 

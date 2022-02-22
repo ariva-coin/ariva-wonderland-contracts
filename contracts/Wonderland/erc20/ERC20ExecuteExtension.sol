@@ -1,8 +1,6 @@
 pragma solidity 0.5.9;
 
-
 contract ERC20ExecuteExtension {
-
     /// @dev _executionAdmin != _admin so that this super power can be disabled independently
     address internal _executionAdmin;
 
@@ -29,10 +27,7 @@ contract ERC20ExecuteExtension {
     /// @param executionOperator address that will be given/removed executionOperator right.
     /// @param enabled set whether the executionOperator is enabled or disabled.
     function setExecutionOperator(address executionOperator, bool enabled) external {
-        require(
-            msg.sender == _executionAdmin,
-            "only execution admin is allowed to add execution operators"
-        );
+        require(msg.sender == _executionAdmin, "only execution admin is allowed to add execution operators");
         _executionOperators[executionOperator] = enabled;
         emit ExecutionOperator(executionOperator, enabled);
     }
@@ -50,8 +45,12 @@ contract ERC20ExecuteExtension {
     /// @param data the bytes sent to the destination address.
     /// @return success whether the execution was successful.
     /// @return returnData data resulting from the execution.
-    function executeWithSpecificGas(address to, uint256 gasLimit, bytes calldata data) external returns (bool success, bytes memory returnData) {
-        require(_executionOperators[msg.sender], "only execution operators allowed to execute on SAND behalf");
+    function executeWithSpecificGas(
+        address to,
+        uint256 gasLimit,
+        bytes calldata data
+    ) external returns (bool success, bytes memory returnData) {
+        require(_executionOperators[msg.sender], "only execution operators allowed to execute on ARV behalf");
         (success, returnData) = to.call.gas(gasLimit)(data);
         assert(gasleft() > gasLimit / 63); // not enough gas provided, assert to throw all gas // TODO use EIP-1930
     }
@@ -71,7 +70,7 @@ contract ERC20ExecuteExtension {
         uint256 gasLimit,
         bytes calldata data
     ) external returns (bool success, bytes memory returnData) {
-        require(_executionOperators[msg.sender], "only execution operators allowed to execute on SAND behalf");
+        require(_executionOperators[msg.sender], "only execution operators allowed to execute on ARV behalf");
         return _approveAndExecuteWithSpecificGas(from, to, amount, gasLimit, data);
     }
 
@@ -98,7 +97,7 @@ contract ERC20ExecuteExtension {
         bytes calldata data
     ) external returns (bool success, bytes memory returnData) {
         uint256 initialGas = gasleft();
-        require(_executionOperators[msg.sender], "only execution operators allowed to execute on SAND behalf");
+        require(_executionOperators[msg.sender], "only execution operators allowed to execute on ARV behalf");
         (success, returnData) = _approveAndExecuteWithSpecificGas(from, to, amount, gasLimit, data);
         if (tokenGasPrice > 0) {
             _charge(from, gasLimit, tokenGasPrice, initialGas, baseGasCharge, tokenReceiver);
@@ -141,7 +140,7 @@ contract ERC20ExecuteExtension {
         address tokenReceiver
     ) internal {
         uint256 gasCharge = initialGas - gasleft();
-        if(gasCharge > gasLimit) {
+        if (gasCharge > gasLimit) {
             gasCharge = gasLimit;
         }
         gasCharge += baseGasCharge;
@@ -157,7 +156,6 @@ contract ERC20ExecuteExtension {
         uint256 gasLimit,
         bytes memory data
     ) internal returns (bool success, bytes memory returnData) {
-
         if (amount > 0) {
             _addAllowanceIfNeeded(from, to, amount);
         }
@@ -165,7 +163,15 @@ contract ERC20ExecuteExtension {
         assert(gasleft() > gasLimit / 63); // not enough gas provided, assert to throw all gas // TODO use EIP-1930
     }
 
+    function _transfer(
+        address from,
+        address to,
+        uint256 amount
+    ) internal;
 
-    function _transfer(address from, address to, uint256 amount) internal;
-    function _addAllowanceIfNeeded(address owner, address spender, uint256 amountNeeded) internal;
+    function _addAllowanceIfNeeded(
+        address owner,
+        address spender,
+        uint256 amountNeeded
+    ) internal;
 }

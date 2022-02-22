@@ -3,25 +3,15 @@ pragma solidity 0.5.9;
 import "../../contracts_common/Libraries/BytesUtil.sol";
 
 contract AssetApproveExtension {
-    // will expect TheSandBox721
-
     mapping(address => mapping(address => uint256)) approvalMessages;
+
     // TODO mapping(address => mapping (uint256 => bool)) usedApprovalMessages;
 
     // TODO remove as we can use erc1155 totkensReceived hook
-    function setApprovalForAllAndCall(address _target, bytes memory _data)
-        public
-        payable
-        returns (bytes memory)
-    {
-        require(
-            BytesUtil.doFirstParamEqualsAddress(_data, msg.sender),
-            "first param != sender"
-        );
+    function setApprovalForAllAndCall(address _target, bytes memory _data) public payable returns (bytes memory) {
+        require(BytesUtil.doFirstParamEqualsAddress(_data, msg.sender), "first param != sender");
         _setApprovalForAllFrom(msg.sender, _target, true);
-        (bool success, bytes memory returnData) = _target.call.value(msg.value)(
-            _data
-        );
+        (bool success, bytes memory returnData) = _target.call.value(msg.value)(_data);
         require(success, "Something went wrong with the extra call.");
         return returnData;
     }
@@ -44,15 +34,10 @@ contract AssetApproveExtension {
         bytes calldata signature
     ) external payable returns (bytes memory) {
         address signer; // TODO ecrecover(hash, v, r, s);
-        require(
-            BytesUtil.doFirstParamEqualsAddress(_data, signer),
-            "first param != signer"
-        );
+        require(BytesUtil.doFirstParamEqualsAddress(_data, signer), "first param != signer");
         require(approvalMessages[signer][_target]++ == _nonce);
         _setApprovalForAllFrom(signer, _target, true);
-        (bool success, bytes memory returnData) = _target.call.value(msg.value)(
-            _data
-        );
+        (bool success, bytes memory returnData) = _target.call.value(msg.value)(_data);
         require(success, "Something went wrong with the extra call.");
         return returnData;
     }
@@ -62,5 +47,4 @@ contract AssetApproveExtension {
         address _operator,
         bool _approved
     ) internal;
-
 }
