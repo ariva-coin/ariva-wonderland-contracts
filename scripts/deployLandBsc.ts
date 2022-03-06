@@ -14,12 +14,12 @@ async function main(): Promise<void> {
   // await run("compile");
 
   // We get the contract to deploy
-  const params = config.mainnet;
+  const params = config.bsc;
   const param = [params.metaTransactionContract, params.admin];
 
   // construction params
 
-  const Land: ContractFactory = await ethers.getContractFactory("Land");
+  const Land: ContractFactory = await ethers.getContractFactory("LandBsc");
   const land: Contract = await Land.deploy(...param);
   await land.deployed();
 
@@ -29,7 +29,7 @@ async function main(): Promise<void> {
 
   await hre.run("verify:verify", {
     address: land.address,
-    contract: "contracts/Land.sol:Land",
+    contract: "contracts/LandBsc.sol:LandBsc",
     constructorArguments: param,
   });
 }
