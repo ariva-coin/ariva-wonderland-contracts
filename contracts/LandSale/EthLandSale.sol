@@ -39,7 +39,7 @@ contract EthLandSale is MetaTransactionReceiver {
     }
 
     modifier onlyAdmin() {
-        require(msg.sender == _admin, "only admin can change the receiving wallet");
+        require(msg.sender == _admin, "only admin");
 
         _;
     }
