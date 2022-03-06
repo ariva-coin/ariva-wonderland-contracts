@@ -51,7 +51,14 @@ contract LandBsc is LandBaseToken {
     function tokenURI(uint256 id) public view returns (string memory) {
         require(_ownerOf(id) != address(0), "Id does not exist");
 
-        return string(abi.encodePacked(uint2str(id), "/metadata.json"));
+        return
+            string(
+                abi.encodePacked(
+                    "https://api.ariva.game/lands/bsc/",
+                    uint2str(id),
+                    "/metadata.json"
+                )
+            );
     }
 
     /**
