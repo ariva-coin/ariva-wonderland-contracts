@@ -1,13 +1,13 @@
 pragma solidity 0.5.9;
 
-import "../Land.sol";
+import "../LandBsc.sol";
 import "../contracts_common/Interfaces/ERC20.sol";
 import "../contracts_common/BaseWithStorage/MetaTransactionReceiver.sol";
 
 contract ArvLandSale is MetaTransactionReceiver {
     uint256 internal constant GRID_SIZE = 1562;
 
-    Land internal _land;
+    LandBsc internal _land;
     ERC20 internal _ariva;
     address payable internal _wallet;
 
@@ -33,7 +33,7 @@ contract ArvLandSale is MetaTransactionReceiver {
     ) public {
         require(sTime > block.timestamp, "Invalid");
 
-        _land = Land(landAddress);
+        _land = LandBsc(landAddress);
         _ariva = ERC20(arivaContractAddress);
         _setMetaTransactionProcessor(initialMetaTx, true);
         _admin = admin;

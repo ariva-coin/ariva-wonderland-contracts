@@ -1,13 +1,13 @@
 pragma solidity 0.5.9;
 
-import "../Land.sol";
+import "../LandEth.sol";
 import "../contracts_common/Interfaces/ERC20.sol";
 import "../contracts_common/BaseWithStorage/MetaTransactionReceiver.sol";
 
 contract EthLandSale is MetaTransactionReceiver {
     uint256 internal constant GRID_SIZE = 1562;
 
-    Land internal _land;
+    LandEth internal _land;
     address payable internal _wallet;
 
     uint256 _startTime;
@@ -31,7 +31,7 @@ contract EthLandSale is MetaTransactionReceiver {
     ) public {
         require(sTime > block.timestamp, "Invalid");
 
-        _land = Land(landAddress);
+        _land = LandEth(landAddress);
         _setMetaTransactionProcessor(initialMetaTx, true);
         _admin = admin;
         _wallet = initialWalletAddress;
