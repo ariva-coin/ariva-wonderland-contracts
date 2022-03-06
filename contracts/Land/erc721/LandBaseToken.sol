@@ -4,9 +4,8 @@ pragma solidity 0.5.9;
 import "./ERC721BaseToken.sol";
 
 contract LandBaseToken is ERC721BaseToken {
-    // Our grid is 15620 x 15620 lands
-    uint256 internal constant GRID_SIZE = 15620;
-    uint256 internal constant GRID_HEIGHT = 10770; // 10770 is the size of the Land
+    // Our grid is 1562 x 1562 lands
+    uint256 internal constant GRID_SIZE = 1562;
 
     uint256 internal constant LAYER = 0xFF00000000000000000000000000000000000000000000000000000000000000;
     uint256 internal constant LAYER_1x1 = 0x0000000000000000000000000000000000000000000000000000000000000000;
@@ -48,7 +47,7 @@ contract LandBaseToken is ERC721BaseToken {
     /// @notice total height of the map
     /// @return height
     function height() external returns (uint256) {
-        return GRID_HEIGHT;
+        return GRID_SIZE;
     }
 
     /// @notice x coordinate of Land token
@@ -85,7 +84,7 @@ contract LandBaseToken is ERC721BaseToken {
         require(to != address(0), "to is zero address");
         require(isMinter(msg.sender), "Only a minter can mint");
         require(x % size == 0 && y % size == 0, "Invalid coordinates");
-        require(x <= GRID_SIZE - size && y <= GRID_HEIGHT - size, "Out of bounds");
+        require(x <= GRID_SIZE - size && y <= GRID_SIZE - size, "Out of bounds");
 
         uint256 quadId;
         uint256 id = x + y * GRID_SIZE;
