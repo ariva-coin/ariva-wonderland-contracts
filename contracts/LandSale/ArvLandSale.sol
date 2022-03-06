@@ -5,7 +5,7 @@ import "../contracts_common/Interfaces/ERC20.sol";
 import "../contracts_common/BaseWithStorage/MetaTransactionReceiver.sol";
 
 contract ArvLandSale is MetaTransactionReceiver {
-    uint256 internal constant GRID_SIZE = 15620;
+    uint256 internal constant GRID_SIZE = 1562;
 
     Land internal _land;
     ERC20 internal _ariva;
