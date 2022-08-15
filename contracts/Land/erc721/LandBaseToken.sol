@@ -83,7 +83,6 @@ contract LandBaseToken is ERC721BaseToken {
     ) external {
         require(to != address(0), "to is zero address");
         require(isMinter(msg.sender), "Only a minter can mint");
-        require(x % size == 0 && y % size == 0, "Invalid coordinates");
         require(x <= GRID_SIZE - size && y <= GRID_SIZE - size, "Out of bounds");
 
         uint256 quadId;
@@ -305,7 +304,6 @@ contract LandBaseToken is ERC721BaseToken {
         uint256 x,
         uint256 y
     ) internal {
-        require(x % size == 0 && y % size == 0, "Invalid coordinates");
         require(x <= GRID_SIZE - size && y <= GRID_SIZE - size, "Out of bounds");
 
         if (size == 3) {
